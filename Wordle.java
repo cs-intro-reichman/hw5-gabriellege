@@ -2,38 +2,45 @@ public class Wordle {
 
     // Reads all words from dictionary filename into a String array.
     public static String[] readDictionary(String filename) {
-		// ...
+        In rdr = new In(filename);
+        return rdr.readAllStrings();
     }
 
     // Choose a random secret word from the dictionary. 
     // Hint: Pick a random index between 0 and dict.length (not including) using Math.random()
     public static String chooseSecretWord(String[] dict) {
-		// ...
+        int v1 = (int)(Math.random() * dict.length);
+        return dict[v1];
     }
 
     // Simple helper: check if letter c appears anywhere in secret (true), otherwise
     // return false.
     public static boolean containsChar(String secret, char c) {
-		// ...
+        for (int v2 = 0; v2 < secret.length(); v2++) {
+            if (secret.charAt(v2) == c) return true;
+        }
+        return false;
     }
 
     // Compute feedback for a single guess into resultRow.
     // G for exact match, Y if letter appears anywhere else, _ otherwise.
     public static void computeFeedback(String secret, String guess, char[] resultRow) {
-		// ...
-		// you may want to use containsChar in your implementation
+        for (int p1 = 0; p1 < secret.length(); p1++) {
+            if (guess.charAt(p1) == secret.charAt(p1)) {
+                resultRow[p1] = 'G';
+            } else if (containsChar(secret, guess.charAt(p1))) {
+                resultRow[p1] = 'Y';
+            } else {
+                resultRow[p1] = '_';
+            }
+        }
     }
 
     // Store guess string (chars) into the given row of guesses 2D array.
-    // For example, of guess is HELLO, and row is 2, then after this function 
-    // guesses should look like:
-    // guesses[2][0] // 'H'
-	// guesses[2][1] // 'E'
-	// guesses[2][2] // 'L'
-	// guesses[2][3] // 'L'
-	// guesses[2][4] // 'O'
     public static void storeGuess(String guess, char[][] guesses, int row) {
-		// ...
+        for (int p2 = 0; p2 < guess.length(); p2++) {
+            guesses[row][p2] = guess.charAt(p2);
+        }
     }
 
     // Prints the game board up to currentRow (inclusive).
@@ -55,7 +62,10 @@ public class Wordle {
 
     // Returns true if all entries in resultRow are 'G'.
     public static boolean isAllGreen(char[] resultRow) {
-		// ...
+        for (int g1 = 0; g1 < resultRow.length; g1++) {
+            if (resultRow[g1] != 'G') return false;
+        }
+        return true;
     }
 
     public static void main(String[] args) {
@@ -70,8 +80,8 @@ public class Wordle {
         String secret = chooseSecretWord(dict);
 
         // Prepare 2D arrays for guesses and results
-        char[][] guesses = // ...
-        char[][] results = // ...
+        char[][] guesses = new char[MAX_ATTEMPTS][WORD_LENGTH];
+        char[][] results = new char[MAX_ATTEMPTS][WORD_LENGTH];
 
         // Prepare to read from the standart input 
         In inp = new In();
@@ -87,9 +97,9 @@ public class Wordle {
             // Loop until you read a valid guess
             while (!valid) {
                 System.out.print("Enter your guess (5-letter word): ");
-                guess = // ... read from the standrad input
+                guess = inp.readString().toUpperCase();
                 
-                if (/* ... check if the guess is valid */) {
+                if (guess.length() != 5) {
                     System.out.println("Invalid word. Please try again.");
                 } else {
                     valid = true;
@@ -97,7 +107,8 @@ public class Wordle {
             }
 
             // Store guess and compute feedback
-            // ... use storeGuess and computeFeedback
+            storeGuess(guess, guesses, attempt);
+            computeFeedback(secret, guess, results[attempt]);
 
             // Print board
             printBoard(guesses, results, attempt);
@@ -112,7 +123,7 @@ public class Wordle {
         }
 
         if (!won) {
-            // ... follow the assignment examples for how the printing should look like
+            System.out.println("Sorry, you did not guess the word. The secret word was: " + secret);
         }
 
         inp.close();
